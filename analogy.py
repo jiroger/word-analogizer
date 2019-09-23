@@ -168,4 +168,6 @@ with codecs.open("my_vectors_200.txt", "w", "utf-8") as f:
 
 # load back in
 word_vectors = KeyedVectors.load_word2vec_format("my_vectors_200.txt", binary=False)
+
+
 print(word_vectors.wv.similar_by_word("red"))

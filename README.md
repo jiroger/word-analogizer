@@ -14,8 +14,12 @@ King is to queen as husband is to ?
 </p>
 
 How to have fun with Word Analogizer
+
+  0) Make sure your machine is using Python 3!!!
   1) Clone this repo
   2) Download pip
   3) Navigate to the `word-analogizer` folder and type `pip install -r requirements.txt`  
   4) Run `analogy.py`
   5) Have fun!
+  
+Important note: using the default values, it will take around a minute for the algorithm to train on the Wikipedia dataset. Please be patient, and do not mess with the command line until it prompts you for an analogy to solve.
