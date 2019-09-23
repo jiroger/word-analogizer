@@ -14,8 +14,8 @@ class Analogy:
             wikipedia = f.read().decode().lower()
         tokens = word_tokenize(wikipedia.lower())
         
-        sorted_words = self.generate_sorted_words(tokens)
-        word2code = self.generate_word2code(sorted_words)
+        self.sorted_words = self.generate_sorted_words(tokens)
+        word2code = self.generate_word2code(self.sorted_words)
         self.codes = self.convert_tokens_to_codes(tokens, word2code)
         
     def generate_sorted_words(self, tokens):
@@ -160,4 +160,12 @@ X_wiki = Analogy.generate_word_by_context(test.codes,
                                   weight_by_distance=True)
 my_vectors = Analogy.reduce(Analogy.x_log(X_wiki), n_components=200)
 
-        
+# save in word2vec format (first line has vocab_size and dimension; other lines have word followed by embedding)
+with codecs.open("my_vectors_200.txt", "w", "utf-8") as f:
+    f.write(str(max_vocab_words) + " " + str(200) + "\n")  
+    for i in range(max_vocab_words):
+        f.write(test.sorted_words[i] + " " + " ".join([str(x) for x in my_vectors[i,:]]) + "\n")
+
+# load back in
+word_vectors = KeyedVectors.load_word2vec_format("my_vectors_200.txt", binary=False)
+print(word_vectors.wv.similar_by_word("red"))
