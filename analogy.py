@@ -151,6 +151,10 @@ class Analogy:
         return np.log10(1 + X_wiki, dtype="float32")
 
 test = Analogy()
+response = str(input)
+
+while(not any(word in response for word in ['quit', 'exit', 'stop', 'end']):
+      
 max_vocab_words = 1000
 max_context_words = 1000
 X_wiki = Analogy.generate_word_by_context(test.codes, 
@@ -169,5 +173,5 @@ with codecs.open("my_vectors_200.txt", "w", "utf-8") as f:
 # load back in
 word_vectors = KeyedVectors.load_word2vec_format("my_vectors_200.txt", binary=False)
 
-
+print("Thank
 print(word_vectors.wv.similar_by_word("red"))
