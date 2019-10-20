@@ -13,13 +13,13 @@ class Analogy:
         with open(path_to_wikipedia, "rb") as f:
             wikipedia = f.read().decode().lower()
         tokens = word_tokenize(wikipedia.lower())
-        
+
         self.sorted_words = self.generate_sorted_words(tokens)
         word2code = self.generate_word2code(self.sorted_words)
         self.codes = self.convert_tokens_to_codes(tokens, word2code)
-        
+
     def generate_sorted_words(self, tokens):
-        """ 
+        """
         Create list of unique words sorted by count in descending order
 
         Parameters
@@ -39,7 +39,7 @@ class Analogy:
         return words
 
     def generate_word2code(self, sorted_words):
-        """ 
+        """
         Create dict that maps a word to its position in the sorted list of words
 
         Parameters
@@ -58,7 +58,7 @@ class Analogy:
         return word2code
 
     def convert_tokens_to_codes(self, tokens, word2code):
-        """ 
+        """
         Convert tokens to codes.
 
         Parameters
@@ -94,20 +94,20 @@ class Analogy:
             context_size: int
                 The number of words to consider on both sides (i.e., to the left and to the right) of the center word in a window.
             weight_by_distance: bool
-                Whether or not the contribution of seeing a context word near a center word should be 
+                Whether or not the contribution of seeing a context word near a center word should be
                 (down-)weighted by their distance:
 
                     False --> contribution is 1.0
                     True  --> contribution is 1.0 / (distance between center word position and context word position)
 
-                For example, suppose ["i", "am", "scared", "of", "dogs"] has codes [45, 10, 222, 25, 88]. 
+                For example, suppose ["i", "am", "scared", "of", "dogs"] has codes [45, 10, 222, 25, 88].
 
-                With weighting False, 
+                With weighting False,
                     X[222, 25], X[222, 10], X[222, 25], and X[222, 88] all get incremented by 1.
 
-                With weighting True, 
-                    X[222, 25] += 1.0/2 
-                    X[222, 10] += 1.0/1 
+                With weighting True,
+                    X[222, 25] += 1.0/2
+                    X[222, 10] += 1.0/1
                     X[222, 25] += 1.0/1
                     X[222, 88] += 1.0/2
 
@@ -139,22 +139,22 @@ class Analogy:
                         X[center_code, context_code] += value
 
         return X
-    
+
     @staticmethod
     def reduce(X, n_components, power=0.0):
         U, Sigma, VT = randomized_svd(X, n_components=n_components)
         # note: TruncatedSVD always multiplies U by Sigma, but can tune results by just using U or raising Sigma to a power
         return U * (Sigma**power)
-    
+
     @staticmethod
     def x_log(X_wiki):
         return np.log10(1 + X_wiki, dtype="float32")
 
-    
+
 test = Analogy()
 response = str(input())
 
-while(not any(word in response for word in ['quit', 'exit', 'stop', 'end'])):   
+while(not any(word in response for word in ['quit', 'exit', 'stop', 'end'])):
     print("Please enter a maximum number of vocab words")
     succeed = False
     while(not succeed):
@@ -171,23 +171,23 @@ while(not any(word in response for word in ['quit', 'exit', 'stop', 'end'])):
             succeed = True
         else:
             print("Please enter a vfalid maximum number of context words (> 0)")
-            
-    X_wiki = Analogy.generate_word_by_context(test.codes, 
-                                  max_vocab_words=max_vocab_words, 
-                                  max_context_words=max_context_words, 
+
+    X_wiki = Analogy.generate_word_by_context(test.codes,
+                                  max_vocab_words=max_vocab_words,
+                                  max_context_words=max_context_words,
                                   context_size=4,
                                   weight_by_distance=True)
     my_vectors = Analogy.reduce(Analogy.x_log(X_wiki), n_components=200)
 
     # save in word2vec format (first line has vocab_size and dimension; other lines have word followed by embedding)
     with codecs.open("my_vectors_200.txt", "w", "utf-8") as f:
-        f.write(str(max_vocab_words) + " " + str(200) + "\n")  
+        f.write(str(max_vocab_words) + " " + str(200) + "\n")
         for i in range(max_vocab_words):
             f.write(test.sorted_words[i] + " " + " ".join([str(x) for x in my_vectors[i,:]]) + "\n")
 
     # load back in
     word_vectors = KeyedVectors.load_word2vec_format("my_vectors_200.txt", binary=False)
-    
-    
+
+
 
 print(word_vectors.wv.similar_by_word("red"))
